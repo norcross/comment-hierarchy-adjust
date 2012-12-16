@@ -29,7 +29,7 @@ $('select#comment_parent').change(function () {
 			obj = jQuery.parseJSON(response);
 		}
 		catch(e) {
-			$('table.comment_xtra').after('<div id="message" class="error below-h2"><p><strong>There was an error</strong></p></div>');
+			$('table.comment_xtra').after('<div id="message" class="error below-h2"><p><strong>' + chaL10n.errorMessage + '</strong></p></div>');
 			$('div#message').delay(3000).fadeOut('slow');
 			}
 
@@ -38,7 +38,7 @@ $('select#comment_parent').change(function () {
 			$('div#message').delay(3000).fadeOut('slow');
 		}
 		else {
-			$('table.comment_xtra').after('<div id="message" class="error below-h2"><p>There was an error.</p></div>');
+			$('table.comment_xtra').after('<div id="message" class="error below-h2"><p>' + chaL10n.errorMessage + '</p></div>');
 			$('div#message').delay(3000).fadeOut('slow');
 			}
 		});
