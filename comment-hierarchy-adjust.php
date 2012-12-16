@@ -33,10 +33,12 @@ class Comment_Hierarchy_Adjust
      * @return Comment_Hierarchy_Adjust
      */
     public function __construct() {
-        add_action      ( 'plugins_loaded',             array( $this, 'textdomain'          )           );
-        add_action      ( 'add_meta_boxes',             array( $this, 'cha_setup'           )           );
-        add_action      ( 'admin_enqueue_scripts',      array( $this, 'admin_scripts'       ), 10       );
-        add_action      ( 'wp_ajax_save_parent',        array( $this, 'save_parent'         )           );
+        
+		add_action( 'plugins_loaded',        array( $this, 'textdomain'    )     );
+        add_action( 'add_meta_boxes',        array( $this, 'cha_setup'     )     );
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ), 10 );
+        add_action( 'wp_ajax_save_parent',   array( $this, 'save_parent'   )     );
+		
     }
 
     /**
@@ -48,6 +50,7 @@ class Comment_Hierarchy_Adjust
     public function textdomain() {
 
         load_plugin_textdomain( 'cha', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		
     }
 
     /**
@@ -70,11 +73,11 @@ class Comment_Hierarchy_Adjust
 
     public function admin_scripts($hook) {
 
-        if ( $hook == 'comment.php' ) :
+        if ( $hook == 'comment.php' ) {
 
             wp_enqueue_script( 'cha-admin', plugins_url('/js/cha.ajax.js', __FILE__) , array('jquery'), null, true );
 
-        endif;
+		}
 
     }
 
@@ -88,12 +91,12 @@ class Comment_Hierarchy_Adjust
 
         // comment query arguments
         $args = array (
-            'post_id'   => $current_post,
-            'type'      => 'comment',
-            'order'     => 'ASC',
+            'post_id' => $current_post,
+            'type'    => 'comment',
+            'order'   => 'ASC',
             );
 
-        $comment_list   = get_comments( $args );
+        $comment_list = get_comments($args);
 
         return $comment_list;
 
@@ -108,9 +111,9 @@ class Comment_Hierarchy_Adjust
     public function save_parent() {
 
         // get my variables
-        $comment    = $_POST['comment'];
-        $postID     = $_POST['postID'];
-        $parent     = $_POST['parent'];
+        $comment = $_POST['comment'];
+        $postID  = $_POST['postID'];
+        $parent  = $_POST['parent'];
 
         $ret = array();
 
