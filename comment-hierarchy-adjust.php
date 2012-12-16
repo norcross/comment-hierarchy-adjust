@@ -86,27 +86,6 @@ class Comment_Hierarchy_Adjust
     }
 
     /**
-     * helper function for grabbing comment info
-     *
-     * @return Comment_Hierarchy_Adjust
-     */
-
-    public function comment_list($current_post) {
-
-        // comment query arguments
-        $args = array (
-            'post_id' => $current_post,
-            'type'    => 'comment',
-            'order'   => 'ASC',
-            );
-
-        $comment_list = get_comments($args);
-
-        return $comment_list;
-
-    }
-
-    /**
      * store new data
      *
      * @return Comment_Hierarchy_Adjust
@@ -195,7 +174,11 @@ class Comment_Hierarchy_Adjust
                 <option value="0" <?php selected( $comment->comment_parent, 0 ); ?> ><?php _e('None', 'cha'); ?></option>
                 <?php
                 // grab comments in the post array
-                $comment_list = $this->comment_list($comment->comment_post_ID);
+                $comment_list = get_comments( array (
+					'post_id' => $comment->comment_post_ID,
+					'type'    => 'comment',
+					'order'   => 'ASC'
+				) );
                 
 				$comment_list_args = array(
 					'current_comment' => $comment->comment_ID,
