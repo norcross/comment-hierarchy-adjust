@@ -24,17 +24,17 @@ Author URI: http://andrewnorcross.com
 */
 
 // Start up the engine
-class Comment_Heirarchy_Adjust
+class Comment_Hierarchy_Adjust
 {
 
     /**
      * This is our constructor
      *
-     * @return Comment_Heirarchy_Adjust
+     * @return Comment_Hierarchy_Adjust
      */
     public function __construct() {
         add_action      ( 'plugins_loaded',             array( $this, 'textdomain'          )           );
-        add_action      ( 'admin_init',                 array( $this, 'cha_setup'           )           );
+        add_action      ( 'add_meta_boxes',             array( $this, 'cha_setup'           )           );
         add_action      ( 'admin_enqueue_scripts',      array( $this, 'admin_scripts'       ), 10       );
         add_action      ( 'wp_ajax_save_parent',        array( $this, 'save_parent'         )           );
     }
@@ -42,7 +42,7 @@ class Comment_Heirarchy_Adjust
     /**
      * load textdomain for international goodness
      *
-     * @return Comment_Heirarchy_Adjust
+     * @return Comment_Hierarchy_Adjust
      */
 
     public function textdomain() {
@@ -53,7 +53,7 @@ class Comment_Heirarchy_Adjust
     /**
      * admin call for loading metabox on comments
      *
-     * @return Comment_Heirarchy_Adjust
+     * @return Comment_Hierarchy_Adjust
      */
 
     public function cha_setup() {
@@ -65,7 +65,7 @@ class Comment_Heirarchy_Adjust
     /**
      * Admin scripts and styles
      *
-     * @return Comment_Heirarchy_Adjust
+     * @return Comment_Hierarchy_Adjust
      */
 
     public function admin_scripts($hook) {
@@ -81,7 +81,7 @@ class Comment_Heirarchy_Adjust
     /**
      * helper function for grabbing comment info
      *
-     * @return Comment_Heirarchy_Adjust
+     * @return Comment_Hierarchy_Adjust
      */
 
     public function comment_list($current_post) {
@@ -103,7 +103,7 @@ class Comment_Heirarchy_Adjust
     /**
      * store new data
      *
-     * @return Comment_Heirarchy_Adjust
+     * @return Comment_Hierarchy_Adjust
      */
 
     public function save_parent() {
@@ -162,7 +162,7 @@ class Comment_Heirarchy_Adjust
     /**
      * comment metabox
      *
-     * @return Comment_Heirarchy_Adjust
+     * @return Comment_Hierarchy_Adjust
      */
 
     public function metabox_cha($comment) {
@@ -217,4 +217,4 @@ class Comment_Heirarchy_Adjust
 
 
 // Instantiate our class
-$Comment_Heirarchy_Adjust = new Comment_Heirarchy_Adjust();
+$Comment_Hierarchy_Adjust = new Comment_Hierarchy_Adjust();

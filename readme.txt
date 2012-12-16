@@ -1,4 +1,4 @@
-=== Comment Heirarchy Adjust ===
+=== Comment Hierarchy Adjust ===
 Contributors: norcross
 Website Link: http://andrewnorcross.com/plugins
 Donate link: https://andrewnorcross.com/donate
