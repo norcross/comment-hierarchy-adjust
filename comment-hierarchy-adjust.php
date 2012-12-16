@@ -58,7 +58,7 @@ class Comment_Hierarchy_Adjust
 
     public function cha_setup() {
 
-        add_meta_box('metabox_cha', __('Comment Heirarchy', 'cha'), array($this, 'metabox_cha'), 'comment', 'normal');
+        add_meta_box('metabox_cha', __('Comment Hierarchy', 'cha'), array($this, 'metabox_cha'), 'comment', 'normal');
 
     }
 
@@ -165,49 +165,41 @@ class Comment_Hierarchy_Adjust
      */
 
     public function metabox_cha($comment) {
-
-        // grab comment ID to pass onto post variable
-        $current_id     = $comment->comment_ID;
-        $current_post   = $comment->comment_post_ID;
+		include_once( plugin_dir_path( __FILE__ ) . 'class-cha-walker-comment-dropdown.php' );
+		
+		// display an error if comment threading is disabled
+		if ( ! get_option( 'thread_comments' ) ) {
+			
+			printf( '<div class="error below-h2"><p><a href="%s">%s</a></p></div>',
+				admin_url( 'options-discussion.php' ),
+				__( 'Threaded comments are disabled.', 'cha' )
+			);
+			
+			return;
+			
+		}
         ?>
         <table class="form-table editcomment comment_xtra">
         <tbody>
         <tr valign="top">
-            <td class="first"><?php _e( 'Change Parent:', 'cha' ); ?></td>
+            <td class="first"><label for="comment_parent"><?php _e( 'Change Parent:', 'cha' ); ?></label></td>
             <td>
             <select name="comment_parent" id="comment_parent">
                 <option value="0" <?php selected( $comment->comment_parent, 0 ); ?> ><?php _e( 'None', 'cha' ); ?></option>
                 <?php
                 // grab comments in the post array
-                $comment_list = $this->comment_list($current_post);
-                // now loop through each comment
-                foreach ( $comment_list as $single_comment ) :
-
-                    // grab some variables for each comment
-                    $single_id  = $single_comment->comment_ID;
-                    $single_wds = $single_comment->comment_content;
-                    $single_ath = $single_comment->comment_author;
-                    $single_par = $single_comment->comment_parent;
-
-                    // check if current is selected
-                    $current    = $single_id == $comment->comment_parent ? 'selected="selected"' : '';
-
-                    // check if current is parent or not
-                    $padding    = $single_par == 0 ? '' : '-- ';
-
-                    // output each comment in the post array, excluding itself
-                    if ($single_id != $current_id) :
-                        $option = '<option value="' . $single_id . '" '.$current.'>';
-                        $option .= $padding.'('.$single_ath.') '.wp_trim_words( $single_wds, 10, null );
-                        $option .= '</option>';
-                        // return each one
-                        echo $option;
-                    endif;
-
-                endforeach;
+                $comment_list = $this->comment_list($comment->comment_post_ID);
+                
+				$comment_list_args = array(
+					'current_comment' => $comment->comment_ID,
+					'current_parent'  => $comment->comment_parent,
+					'max_depth'       => get_option( 'thread_comments_depth' ),
+					'walker'          => new CHA_Walker_Comment_Dropdown
+				);
+				
+				wp_list_comments( $comment_list_args, $comment_list );
                 ?>
             </select>
-
             </td>
         </tr>
         </tbody>
