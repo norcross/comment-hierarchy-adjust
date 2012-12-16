@@ -89,10 +89,9 @@ class Comment_Hierarchy_Adjust
         // comment query arguments
         $args = array (
             'post_id'   => $current_post,
-            'orderby'   => '',
+            'type'      => 'comment',
             'order'     => 'ASC',
             );
-
 
         $comment_list   = get_comments( $args );
 
@@ -188,14 +187,18 @@ class Comment_Hierarchy_Adjust
                     $single_id  = $single_comment->comment_ID;
                     $single_wds = $single_comment->comment_content;
                     $single_ath = $single_comment->comment_author;
+                    $single_par = $single_comment->comment_parent;
 
-                    // check for current parent
+                    // check if current is selected
                     $current    = $single_id == $comment->comment_parent ? 'selected="selected"' : '';
+
+                    // check if current is parent or not
+                    $padding    = $single_par == 0 ? '' : '-- ';
 
                     // output each comment in the post array, excluding itself
                     if ($single_id != $current_id) :
                         $option = '<option value="' . $single_id . '" '.$current.'>';
-                        $option .= '('.$single_ath.') '.wp_trim_words( $single_wds, 10, null );
+                        $option .= $padding.'('.$single_ath.') '.wp_trim_words( $single_wds, 10, null );
                         $option .= '</option>';
                         // return each one
                         echo $option;
