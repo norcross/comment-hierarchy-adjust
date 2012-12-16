@@ -32,11 +32,14 @@ class Comment_Hierarchy_Adjust
      *
      * @return Comment_Hierarchy_Adjust
      */
+
     public function __construct() {
-        add_action      ( 'plugins_loaded',             array( $this, 'textdomain'          )           );
-        add_action      ( 'add_meta_boxes',             array( $this, 'cha_setup'           )           );
-        add_action      ( 'admin_enqueue_scripts',      array( $this, 'admin_scripts'       ), 10       );
-        add_action      ( 'wp_ajax_save_parent',        array( $this, 'save_parent'         )           );
+        
+		add_action( 'plugins_loaded',        array( $this, 'textdomain'    )     );
+        add_action( 'add_meta_boxes',        array( $this, 'cha_setup'     )     );
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ), 10 );
+        add_action( 'wp_ajax_save_parent',   array( $this, 'save_parent'   )     );
+		
     }
 
     /**
@@ -48,6 +51,7 @@ class Comment_Hierarchy_Adjust
     public function textdomain() {
 
         load_plugin_textdomain( 'cha', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		
     }
 
     /**
@@ -58,7 +62,7 @@ class Comment_Hierarchy_Adjust
 
     public function cha_setup() {
 
-        add_meta_box('metabox_cha', __('Comment Heirarchy', 'cha'), array($this, 'metabox_cha'), 'comment', 'normal');
+        add_meta_box('metabox_cha', __('Comment Hierarchy', 'cha'), array($this, 'metabox_cha'), 'comment', 'normal');
 
     }
 
@@ -70,32 +74,14 @@ class Comment_Hierarchy_Adjust
 
     public function admin_scripts($hook) {
 
-        if ( $hook == 'comment.php' ) :
+        if ( 'comment.php' == $hook ) {
 
             wp_enqueue_script( 'cha-admin', plugins_url('/js/cha.ajax.js', __FILE__) , array('jquery'), null, true );
+			wp_localize_script( 'cha-admin', 'chaL10n', array(
+				'errorMessage' => __('There was an error.', 'cha')
+			) );
 
-        endif;
-
-    }
-
-    /**
-     * helper function for grabbing comment info
-     *
-     * @return Comment_Hierarchy_Adjust
-     */
-
-    public function comment_list($current_post) {
-
-        // comment query arguments
-        $args = array (
-            'post_id'   => $current_post,
-            'type'      => 'comment',
-            'order'     => 'ASC',
-            );
-
-        $comment_list   = get_comments( $args );
-
-        return $comment_list;
+		}
 
     }
 
@@ -108,9 +94,9 @@ class Comment_Hierarchy_Adjust
     public function save_parent() {
 
         // get my variables
-        $comment    = $_POST['comment'];
-        $postID     = $_POST['postID'];
-        $parent     = $_POST['parent'];
+        $comment = $_POST['comment'];
+        $postID  = $_POST['postID'];
+        $parent  = $_POST['parent'];
 
         $ret = array();
 
@@ -118,7 +104,7 @@ class Comment_Hierarchy_Adjust
         if( !isset( $postID ) || !is_numeric( $postID ) ) {
 
             $ret['success'] = false;
-            $ret['message'] = 'No post exists to update';
+            $ret['message'] = __('No post exists to update', 'cha');
 
             echo json_encode($ret);
             die();
@@ -128,7 +114,7 @@ class Comment_Hierarchy_Adjust
         if( !isset( $comment ) || !is_numeric( $comment ) ) {
 
             $ret['success'] = false;
-            $ret['message'] = 'No parent selected';
+            $ret['message'] = __('No parent selected', 'cha');
 
             echo json_encode($ret);
             die();
@@ -138,7 +124,7 @@ class Comment_Hierarchy_Adjust
         if( !isset( $parent ) || !is_numeric( $parent ) ) {
 
             $ret['success'] = false;
-            $ret['message'] = 'No parent selected';
+            $ret['message'] = __('No parent selected', 'cha');
 
             echo json_encode($ret);
             die();
@@ -146,7 +132,7 @@ class Comment_Hierarchy_Adjust
 
         // all good? then let's proceed
         $ret['success'] = true;
-        $ret['message'] = 'Comment updated';
+        $ret['message'] = __('Comment updated', 'cha');
 
         // update the comment setup now
         $updates = get_comment($comment, ARRAY_A);
@@ -165,49 +151,45 @@ class Comment_Hierarchy_Adjust
      */
 
     public function metabox_cha($comment) {
-
-        // grab comment ID to pass onto post variable
-        $current_id     = $comment->comment_ID;
-        $current_post   = $comment->comment_post_ID;
+		include_once( plugin_dir_path( __FILE__ ) . 'class-cha-walker-comment-dropdown.php' );
+		
+		// display an error if comment threading is disabled
+		if ( ! get_option( 'thread_comments' ) ) {
+			
+			printf( '<div class="error below-h2"><p><a href="%s">%s</a></p></div>',
+				admin_url( 'options-discussion.php' ),
+				__('Threaded comments are disabled.', 'cha')
+			);
+			
+			return;
+			
+		}
         ?>
         <table class="form-table editcomment comment_xtra">
         <tbody>
         <tr valign="top">
-            <td class="first"><?php _e( 'Change Parent:', 'cha' ); ?></td>
+            <td class="first"><label for="comment_parent"><?php _e('Change Parent:', 'cha'); ?></label></td>
             <td>
             <select name="comment_parent" id="comment_parent">
-                <option value="0" <?php selected( $comment->comment_parent, 0 ); ?> ><?php _e( 'None', 'cha' ); ?></option>
+                <option value="0" <?php selected( $comment->comment_parent, 0 ); ?> ><?php _e('None', 'cha'); ?></option>
                 <?php
                 // grab comments in the post array
-                $comment_list = $this->comment_list($current_post);
-                // now loop through each comment
-                foreach ( $comment_list as $single_comment ) :
-
-                    // grab some variables for each comment
-                    $single_id  = $single_comment->comment_ID;
-                    $single_wds = $single_comment->comment_content;
-                    $single_ath = $single_comment->comment_author;
-                    $single_par = $single_comment->comment_parent;
-
-                    // check if current is selected
-                    $current    = $single_id == $comment->comment_parent ? 'selected="selected"' : '';
-
-                    // check if current is parent or not
-                    $padding    = $single_par == 0 ? '' : '-- ';
-
-                    // output each comment in the post array, excluding itself
-                    if ($single_id != $current_id) :
-                        $option = '<option value="' . $single_id . '" '.$current.'>';
-                        $option .= $padding.'('.$single_ath.') '.wp_trim_words( $single_wds, 10, null );
-                        $option .= '</option>';
-                        // return each one
-                        echo $option;
-                    endif;
-
-                endforeach;
+                $comment_list = get_comments( array (
+					'post_id' => $comment->comment_post_ID,
+					'type'    => 'comment',
+					'order'   => 'ASC'
+				) );
+                
+				$comment_list_args = array(
+					'current_comment' => $comment->comment_ID,
+					'current_parent'  => $comment->comment_parent,
+					'max_depth'       => get_option( 'thread_comments_depth' ),
+					'walker'          => new CHA_Walker_Comment_Dropdown
+				);
+				
+				wp_list_comments( $comment_list_args, $comment_list );
                 ?>
             </select>
-
             </td>
         </tr>
         </tbody>
