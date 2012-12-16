@@ -32,6 +32,7 @@ class Comment_Hierarchy_Adjust
      *
      * @return Comment_Hierarchy_Adjust
      */
+
     public function __construct() {
         
 		add_action( 'plugins_loaded',        array( $this, 'textdomain'    )     );
@@ -73,9 +74,12 @@ class Comment_Hierarchy_Adjust
 
     public function admin_scripts($hook) {
 
-        if ( $hook == 'comment.php' ) {
+        if ( 'comment.php' == $hook ) {
 
             wp_enqueue_script( 'cha-admin', plugins_url('/js/cha.ajax.js', __FILE__) , array('jquery'), null, true );
+			wp_localize_script( 'cha-admin', 'chaL10n', array(
+				'errorMessage' => __('There was an error.', 'cha')
+			) );
 
 		}
 
@@ -121,7 +125,7 @@ class Comment_Hierarchy_Adjust
         if( !isset( $postID ) || !is_numeric( $postID ) ) {
 
             $ret['success'] = false;
-            $ret['message'] = 'No post exists to update';
+            $ret['message'] = __('No post exists to update', 'cha');
 
             echo json_encode($ret);
             die();
@@ -131,7 +135,7 @@ class Comment_Hierarchy_Adjust
         if( !isset( $comment ) || !is_numeric( $comment ) ) {
 
             $ret['success'] = false;
-            $ret['message'] = 'No parent selected';
+            $ret['message'] = __('No parent selected', 'cha');
 
             echo json_encode($ret);
             die();
@@ -141,7 +145,7 @@ class Comment_Hierarchy_Adjust
         if( !isset( $parent ) || !is_numeric( $parent ) ) {
 
             $ret['success'] = false;
-            $ret['message'] = 'No parent selected';
+            $ret['message'] = __('No parent selected', 'cha');
 
             echo json_encode($ret);
             die();
@@ -149,7 +153,7 @@ class Comment_Hierarchy_Adjust
 
         // all good? then let's proceed
         $ret['success'] = true;
-        $ret['message'] = 'Comment updated';
+        $ret['message'] = __('Comment updated', 'cha');
 
         // update the comment setup now
         $updates = get_comment($comment, ARRAY_A);
@@ -175,7 +179,7 @@ class Comment_Hierarchy_Adjust
 			
 			printf( '<div class="error below-h2"><p><a href="%s">%s</a></p></div>',
 				admin_url( 'options-discussion.php' ),
-				__( 'Threaded comments are disabled.', 'cha' )
+				__('Threaded comments are disabled.', 'cha')
 			);
 			
 			return;
@@ -185,10 +189,10 @@ class Comment_Hierarchy_Adjust
         <table class="form-table editcomment comment_xtra">
         <tbody>
         <tr valign="top">
-            <td class="first"><label for="comment_parent"><?php _e( 'Change Parent:', 'cha' ); ?></label></td>
+            <td class="first"><label for="comment_parent"><?php _e('Change Parent:', 'cha'); ?></label></td>
             <td>
             <select name="comment_parent" id="comment_parent">
-                <option value="0" <?php selected( $comment->comment_parent, 0 ); ?> ><?php _e( 'None', 'cha' ); ?></option>
+                <option value="0" <?php selected( $comment->comment_parent, 0 ); ?> ><?php _e('None', 'cha'); ?></option>
                 <?php
                 // grab comments in the post array
                 $comment_list = $this->comment_list($comment->comment_post_ID);
