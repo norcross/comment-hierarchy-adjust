@@ -177,7 +177,6 @@ class Comment_Heirarchy_Adjust
             <td class="first"><?php _e( 'Change Parent:', 'cha' ); ?></td>
             <td>
             <select name="comment_parent" id="comment_parent">
-                <option value="boom">Boom</option>
                 <option value="0" <?php selected( $comment->comment_parent, 0 ); ?> ><?php _e( 'None', 'cha' ); ?></option>
                 <?php
                 // grab comments in the post array
