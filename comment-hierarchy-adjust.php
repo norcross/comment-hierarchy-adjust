@@ -3,7 +3,7 @@
 Plugin Name: Comment Hierarchy Adjust
 Plugin URI: http://andrewnorcross.com/plugins/
 Description: Something
-Version: 0.1
+Version: 1.0
 Author: Andrew Norcross
 Author URI: http://andrewnorcross.com
 
@@ -34,12 +34,12 @@ class Comment_Hierarchy_Adjust
      */
 
     public function __construct() {
-        
+
 		add_action( 'plugins_loaded',        array( $this, 'textdomain'    )     );
         add_action( 'add_meta_boxes',        array( $this, 'cha_setup'     )     );
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_scripts' ), 10 );
         add_action( 'wp_ajax_save_parent',   array( $this, 'save_parent'   )     );
-		
+
     }
 
     /**
@@ -51,7 +51,7 @@ class Comment_Hierarchy_Adjust
     public function textdomain() {
 
         load_plugin_textdomain( 'cha', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-		
+
     }
 
     /**
@@ -152,17 +152,17 @@ class Comment_Hierarchy_Adjust
 
     public function metabox_cha($comment) {
 		include_once( plugin_dir_path( __FILE__ ) . 'class-cha-walker-comment-dropdown.php' );
-		
+
 		// display an error if comment threading is disabled
 		if ( ! get_option( 'thread_comments' ) ) {
-			
+
 			printf( '<div class="error below-h2"><p><a href="%s">%s</a></p></div>',
 				admin_url( 'options-discussion.php' ),
 				__('Threaded comments are disabled.', 'cha')
 			);
-			
+
 			return;
-			
+
 		}
         ?>
         <table class="form-table editcomment comment_xtra">
@@ -179,14 +179,14 @@ class Comment_Hierarchy_Adjust
 					'type'    => 'comment',
 					'order'   => 'ASC'
 				) );
-                
+
 				$comment_list_args = array(
 					'current_comment' => $comment->comment_ID,
 					'current_parent'  => $comment->comment_parent,
 					'max_depth'       => get_option( 'thread_comments_depth' ),
 					'walker'          => new CHA_Walker_Comment_Dropdown
 				);
-				
+
 				wp_list_comments( $comment_list_args, $comment_list );
                 ?>
             </select>
